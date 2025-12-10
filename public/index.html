@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Timeline - Mis Comidas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ Timeline de Mis Comidas</h1>
+            <p class="subtitle">Actualizando automáticamente desde Google Drive</p>
+        </header>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Cargando imágenes...</p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+
+        <div id="timeline" class="timeline">
+            <!-- Las imágenes se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
