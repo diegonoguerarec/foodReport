@@ -1,7 +1,6 @@
-require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const driveService = require('./driveService');
+const imageService = require('./imageService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,14 +8,17 @@ const PORT = process.env.PORT || 3000;
 // Servir archivos estáticos
 app.use(express.static('public'));
 
+// Servir carpeta de imágenes
+app.use('/images', express.static('images'));
+
 // Endpoint para obtener las imágenes del timeline
 app.get('/api/images', async (req, res) => {
   try {
-    const images = await driveService.getImages();
+    const images = await imageService.getImages();
     res.json(images);
   } catch (error) {
     console.error('Error al obtener imágenes:', error);
-    res.status(500).json({ error: 'Error al obtener imágenes de Google Drive' });
+    res.status(500).json({ error: 'Error al obtener imágenes' });
   }
 });
 

@@ -17,8 +17,9 @@ async function getImages() {
   try {
     const response = await drive.files.list({
       q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed=false`,
-      fields: 'files(id, name, mimeType, createdTime, modifiedTime, thumbnailLink, webContentLink)',
-      orderBy: 'createdTime desc'
+      fields: 'files(id, name, mimeType, createdTime, modifiedTime, thumbnailLink, webContentLink, webViewLink, iconLink)',
+      orderBy: 'createdTime desc',
+      pageSize: 1000
     });
 
     const files = response.data.files;
@@ -30,11 +31,10 @@ async function getImages() {
       mimeType: file.mimeType,
       createdTime: file.createdTime,
       modifiedTime: file.modifiedTime,
-      thumbnailUrl: file.thumbnailLink,
-      // URL directa para ver la imagen (requiere permisos públicos)
-      imageUrl: `https://drive.google.com/uc?export=view&id=${file.id}`,
-      // URL alternativa
-      viewUrl: `https://drive.google.com/file/d/${file.id}/view`
+      // Usar proxy local para evitar problemas de CORS
+      imageUrl: `/api/image/${file.id}`,
+      viewUrl: `https://drive.google.com/file/d/${file.id}/view`,
+      thumbnailUrl: file.thumbnailLink
     }));
 
     return images;
@@ -44,6 +44,25 @@ async function getImages() {
   }
 }
 
+/**
+ * Obtiene el stream de una imagen desde Google Drive
+ * @param {string} fileId - ID del archivo en Google Drive
+ * @returns {Promise<Stream>} Stream de la imagen
+ */
+async function getImageStream(fileId) {
+  try {
+    const response = await drive.files.get(
+      { fileId: fileId, alt: 'media' },
+      { responseType: 'stream' }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener stream de imagen:', error.message);
+    throw error;
+  }
+}
+
 module.exports = {
-  getImages
+  getImages,
+  getImageStream
 };

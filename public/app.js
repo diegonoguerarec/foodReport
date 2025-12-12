@@ -40,30 +40,61 @@ function displayImages(images) {
     return;
   }
   
-  timeline.innerHTML = images.map(image => {
-    const date = new Date(image.createdTime);
+  // Agrupar imágenes por día
+  const imagesByDay = groupImagesByDay(images);
+  
+  // Generar HTML agrupado por día
+  timeline.innerHTML = Object.keys(imagesByDay).map(day => {
+    const dayImages = imagesByDay[day];
+    const date = new Date(dayImages[0].createdTime);
     const formattedDate = formatDate(date);
-    const formattedTime = formatTime(date);
     
-    return `
-      <div class="timeline-item">
-        <div class="timeline-marker"></div>
-        <div class="timeline-content">
-          <div class="image-wrapper">
+    const imagesHTML = dayImages.map(image => {
+      const time = new Date(image.createdTime);
+      const formattedTime = formatTime(time);
+      
+      return `
+        <div class="day-image-item">
+          <div class="day-image-wrapper">
             <img src="${image.imageUrl}" 
                  alt="${image.name}" 
-                 loading="lazy"
-                 onerror="this.onerror=null; this.src='${image.thumbnailUrl}';">
+                 loading="lazy">
           </div>
-          <div class="image-info">
-            <div class="image-date">${formattedDate}</div>
-            <div class="image-time">${formattedTime}</div>
-            <div class="image-name">${image.name}</div>
-          </div>
+          <div class="day-image-time">${formattedTime}</div>
+        </div>
+      `;
+    }).join('');
+    
+    return `
+      <div class="day-group">
+        <div class="day-header">
+          <div class="day-marker"></div>
+          <h2 class="day-date">${formattedDate}</h2>
+          <span class="day-count">${dayImages.length} comida${dayImages.length > 1 ? 's' : ''}</span>
+        </div>
+        <div class="day-images-grid">
+          ${imagesHTML}
         </div>
       </div>
     `;
   }).join('');
+}
+
+// Agrupar imágenes por día
+function groupImagesByDay(images) {
+  const groups = {};
+  
+  images.forEach(image => {
+    const date = new Date(image.createdTime);
+    const dayKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    
+    if (!groups[dayKey]) {
+      groups[dayKey] = [];
+    }
+    groups[dayKey].push(image);
+  });
+  
+  return groups;
 }
 
 // Formatear fecha
